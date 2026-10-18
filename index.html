@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JLM6MM17P9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-JLM6MM17P9');
+</script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>シンプル席替えメーカー</title>
@@ -34,14 +45,14 @@
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 640px; /* PCでも広々と使えるように最大幅を拡張 */
             background: var(--card-bg);
-            padding: 24px 20px;
+            padding: 32px 24px;
             border-radius: 24px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
 
         .header-top {
@@ -52,7 +63,7 @@
         }
 
         h1 {
-            font-size: 1.35rem;
+            font-size: 1.5rem;
             color: var(--text-color);
             font-weight: 700;
         }
@@ -64,17 +75,17 @@
         }
 
         label {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-color);
         }
 
         input[type="number"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            font-size: 0.9rem;
+            font-size: 1rem;
             outline: none;
         }
 
@@ -84,22 +95,22 @@
 
         .settings-row {
             display: flex;
-            gap: 12px;
+            gap: 16px;
         }
 
         .settings-row > div {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
         }
 
         select {
             width: 100%;
-            padding: 8px 10px;
+            padding: 12px;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 0.85rem;
+            border-radius: 12px;
+            font-size: 1rem;
             background: #fff;
             outline: none;
             cursor: pointer;
@@ -108,7 +119,7 @@
         /* 男女別の入力欄を並べるコンテナ */
         .gender-inputs {
             display: none;
-            gap: 12px;
+            gap: 16px;
         }
 
         .gender-inputs.active {
@@ -127,12 +138,12 @@
 
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 12px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -145,7 +156,7 @@
 
         /* 操作ヒント・ステータス表示 */
         .swap-hint {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             text-align: center;
             display: none;
@@ -161,36 +172,36 @@
             background-color: #f8fafc;
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 12px;
-            max-height: 260px;
+            padding: 16px;
+            max-height: 400px; /* PC画面でより多く見られるように高さを拡大 */
             overflow-y: auto;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
         }
 
         .teacher-desk {
             background: #e2e8f0;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            padding: 4px;
-            border-radius: 6px;
+            padding: 6px;
+            border-radius: 8px;
             font-weight: bold;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
         .desk-grid {
             display: grid;
-            gap: 6px;
+            gap: 8px;
         }
 
         .desk-card {
             background: #ffffff;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px 4px;
+            border-radius: 10px;
+            padding: 12px 6px;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: 500;
             word-break: break-all;
             display: flex;
@@ -199,7 +210,7 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.02);
             cursor: pointer;
             transition: transform 0.1s, border-color 0.1s;
-            min-height: 38px;
+            min-height: 48px;
         }
 
         .desk-card:active {
@@ -209,7 +220,7 @@
         /* 選択中のカード強調表示 */
         .desk-card.selected {
             border: 2px solid var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(101, 119, 179, 0.3);
+            box-shadow: 0 0 0 3px rgba(101, 119, 179, 0.3);
         }
 
         /* 空席（プレースホルダー）用スタイル（最後尾のみ） */
@@ -235,12 +246,12 @@
             text-align: center;
             display: flex;
             justify-content: center;
-            gap: 16px;
-            margin-top: 2px;
+            gap: 20px;
+            margin-top: 4px;
         }
 
         .footer-links a {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             text-decoration: none;
         }
