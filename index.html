@@ -304,8 +304,8 @@
             <div class="section-group">
                 <label for="pairModeSelect">配置モード</label>
                 <select id="pairModeSelect" onchange="toggleModeInputs()">
-                    <option value="normal">通常（完全ランダム）</option>
-                    <option value="boyGirl">男女ペア（市松模様配置）</option>
+                    <option value="normal">完全ランダム</option>
+                    <option value="boyGirl">男女ペア</option>
                 </select>
             </div>
         </div>
@@ -337,7 +337,8 @@
         const swapHint = document.getElementById('swapHint');
 
         let currentPlacedItems = []; 
-        let selectedIndex = null;    
+        let selectedIndex = null;
+        let isSeatingActive = false; // 席が表示されているかどうかのフラグ
 
         function toggleModeInputs() {
             const mode = pairModeSelect.value;
@@ -372,6 +373,14 @@
             if (savedMode) {
                 pairModeSelect.value = savedMode;
                 toggleModeInputs();
+            }
+        });
+
+        // ページを離れる・閉じる・戻るボタンを押す際の警告イベント
+        window.addEventListener('beforeunload', (event) => {
+            if (isSeatingActive) {
+                event.preventDefault();
+                event.returnValue = ''; // 標準的なブラウザの警告を有効化
             }
         });
 
@@ -474,6 +483,7 @@
                 currentPlacedItems = items;
             }
 
+            isSeatingActive = true; // 席が表示されたので離脱警告を有効化
             renderSeating();
         }
 
