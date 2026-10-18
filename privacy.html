@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プライバシーポリシー - シンプルツールスイート</title>
+    <style>
+        :root {
+            --primary-color: #6577B3;
+            --primary-hover: #54649b;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 24px 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 32px 24px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+
+        section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 4px;
+            margin-top: 8px;
+        }
+
+        p, li {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        .update-date {
+            text-align: right;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* わかりやすい戻るボタンのスタイル */
+        .back-action {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-back {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .btn-back:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .sub-link {
+            text-align: center;
+        }
+
+        .sub-link a {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .sub-link a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>プライバシーポリシー</h1>
+        <div class="update-date">制定日：2026年10月18日</div>
+
+        <section>
+            <p>当サイトでは、ユーザーの皆様に安心してご利用いただけるよう、以下の通りプライバシーポリシーを定めます。</p>
+        </section>
+
+        <section>
+            <h2>1. 個人情報の収集について</h2>
+            <p>当サイトでは、ツールのご利用にあたってユーザーの氏名、メールアドレス、電話番号などの<strong>個人情報を一切収集・保有いたしません</strong>。お問い合わせ等はすべて外部サービス（Marshmallow等）を利用しており、当サイトのサーバー上で個人情報を記録・管理することはございません。</p>
+        </section>
+
+        <section>
+            <h2>2. Googleアナリティクス（アクセス解析）の利用について</h2>
+            <p>当サイトでは、サービス向上およびサイトの利用状況を把握するため、アクセス解析ツール「<strong>Googleアナリティクス4（GA4）</strong>」を利用しています。</p>
+            <ul>
+                <li>Googleアナリティクスはトラフィックデータの収集のためにCookie（クッキー）を使用しています。</li>
+                <li>このトラフィックデータは匿名で収集されており、個人を特定するものではありません。</li>
+                <li>ユーザーはブラウザの設定により、Cookieの無効化（オプトアウト）を行うことで収集を拒否することができます。詳しくは<a href="https://policies.google.com/technologies/ads?hl=ja" target="_blank" rel="noopener">Googleのポリシーと規約ページ</a>をご確認ください。</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>3. ローカルストレージ（Local Storage）の利用について</h2>
+            <p>当サイトの一部ツール（席替えメーカーの設定記憶など）では、利便性の向上を目的としてブラウザの<strong>ローカルストレージ</strong>機能を使用する場合があります。これらのデータはユーザーご自身の端末内にのみ保存され、当サイトのサーバーに送信・蓄積されることはありません。</p>
+        </section>
+
+        <section>
+            <h2>4. 画像およびデータの処理に関する安全性</h2>
+            <p>当サイトで扱う入力データ（人数設定やテキスト等）およびドット絵作成などの画像処理は、すべてユーザーの端末内（ブラウザ上）で完結して処理されます。外部サーバーへ機密データや画像ファイルがアップロード・保存されることは一切ありません。</p>
+        </section>
+
+        <section>
+            <h2>5. 免責事項・著作権について</h2>
+            <p>当サイトに掲載されている文章、デザイン、ソースコード等の著作権は開発者に帰属します（無断転載を禁じます）。また、当サイトのツール利用によって生じたいかなるトラブルや損害についても、開発者は一切の責任を負いかねますのでご了承ください。</p>
+        </section>
+
+        <section>
+            <h2>6. プライバシーポリシーの改定について</h2>
+            <p>本ポリシーの内容は、法令の改正やサービスの改善に伴い、事前の予告なく変更されることがあります。変更後のプライバシーポリシーは、当サイトに掲載した時点より効力を持ちます。</p>
+        </section>
+
+        <div class="back-action">
+            <a href="index.html" class="btn-back">← 席替えメーカーに戻る</a>
+        </div>
+    </div>
+
+</body>
+</html>

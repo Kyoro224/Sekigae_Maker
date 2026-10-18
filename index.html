@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シンプル席替えメーカー</title>
+    <style>
+        :root {
+            --primary-color: #6577B3;
+            --primary-hover: #54649b;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            padding: 24px 20px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 1.35rem;
+            color: var(--text-color);
+            font-weight: 700;
+        }
+
+        .section-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        .settings-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .settings-row > div {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            background: #fff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* 男女別の入力欄を並べるコンテナ */
+        .gender-inputs {
+            display: none;
+            gap: 12px;
+        }
+
+        .gender-inputs.active {
+            display: flex;
+        }
+
+        .single-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .single-input-container.inactive {
+            display: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* 操作ヒント・ステータス表示 */
+        .swap-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            display: none;
+        }
+
+        .swap-hint.active {
+            display: block;
+        }
+
+        /* 席の結果表示エリア（初期状態は非表示） */
+        .seating-area {
+            display: none;
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 12px;
+            max-height: 260px;
+            overflow-y: auto;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .teacher-desk {
+            background: #e2e8f0;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding: 4px;
+            border-radius: 6px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .desk-grid {
+            display: grid;
+            gap: 6px;
+        }
+
+        .desk-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            cursor: pointer;
+            transition: transform 0.1s, border-color 0.1s;
+            min-height: 38px;
+        }
+
+        .desk-card:active {
+            transform: scale(0.95);
+        }
+
+        /* 選択中のカード強調表示 */
+        .desk-card.selected {
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(101, 119, 179, 0.3);
+        }
+
+        /* 空席（プレースホルダー）用スタイル（最後尾のみ） */
+        .desk-card.empty {
+            background-color: transparent;
+            border: 1px dashed var(--border-color);
+            box-shadow: none;
+            cursor: pointer;
+        }
+
+        /* 男女の背景色による見分け用クラス */
+        .desk-card.boy {
+            background-color: #eff6ff;
+            color: #1e40af;
+        }
+
+        .desk-card.girl {
+            background-color: #fdf2f8;
+            color: #9d174d;
+        }
+
+        .footer-links {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 2px;
+        }
+
+        .footer-links a {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-top">
+            <h1>席替えメーカー</h1>
+        </div>
+
+        <!-- 通常モード用の全体人数入力 -->
+        <div class="section-group single-input-container" id="totalInputGroup">
+            <label for="totalCountInput">クラスの人数（出席番号の合計）</label>
+            <input type="number" id="totalCountInput" min="2" max="100" value="30" placeholder="例: 30">
+        </div>
+
+        <!-- 男女ペアモード用の個別人数入力 -->
+        <div class="gender-inputs" id="genderInputGroup">
+            <div class="section-group" style="flex: 1;">
+                <label for="boyCountInput">男子の人数</label>
+                <input type="number" id="boyCountInput" min="0" max="100" value="15" placeholder="例: 15">
+            </div>
+            <div class="section-group" style="flex: 1;">
+                <label for="girlCountInput">女子の人数</label>
+                <input type="number" id="girlCountInput" min="0" max="100" value="15" placeholder="例: 15">
+            </div>
+        </div>
+
+        <div class="settings-row">
+            <div class="section-group">
+                <label for="columnsSelect">横の列数</label>
+                <select id="columnsSelect">
+                    <option value="1">1列</option>
+                    <option value="2">2列</option>
+                    <option value="3">3列</option>
+                    <option value="4">4列</option>
+                    <option value="5">5列</option>
+                    <option value="6" selected>6列</option>
+                    <option value="7">7列</option>
+                    <option value="8">8列</option>
+                </select>
+            </div>
+            <div class="section-group">
+                <label for="pairModeSelect">配置モード</label>
+                <select id="pairModeSelect" onchange="toggleModeInputs()">
+                    <option value="normal">通常（完全ランダム）</option>
+                    <option value="boyGirl">男女ペア（市松模様配置）</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn" onclick="shuffleSeats()">席替えを実行する！</button>
+        <div class="swap-hint" id="swapHint">💡 入れ替えたい席を2つタップすると位置が入れ替わります</div>
+
+        <!-- 席の結果表示エリア（初期状態は非表示） -->
+        <div class="seating-area" id="seatingArea">
+            <div class="teacher-desk">ひなおもて（教壇）</div>
+            <!-- 動的にグリッドが挿入されます -->
+        </div>
+
+        <div class="footer-links">
+            <a href="https://kyoro224.github.io/developer/index.html">開発者について</a>
+            <a href="privacy.html">プライバシーポリシー</a>
+        </div>
+    </div>
+
+    <script>
+        const totalInputGroup = document.getElementById('totalInputGroup');
+        const genderInputGroup = document.getElementById('genderInputGroup');
+        const totalCountInput = document.getElementById('totalCountInput');
+        const boyCountInput = document.getElementById('boyCountInput');
+        const girlCountInput = document.getElementById('girlCountInput');
+        const columnsSelect = document.getElementById('columnsSelect');
+        const pairModeSelect = document.getElementById('pairModeSelect');
+        const seatingArea = document.getElementById('seatingArea');
+        const swapHint = document.getElementById('swapHint');
+
+        let currentPlacedItems = []; 
+        let selectedIndex = null;    
+
+        function toggleModeInputs() {
+            const mode = pairModeSelect.value;
+            if (mode === 'boyGirl') {
+                totalInputGroup.classList.add('inactive');
+                genderInputGroup.classList.add('active');
+            } else {
+                totalInputGroup.classList.remove('inactive');
+                genderInputGroup.classList.remove('active');
+            }
+        }
+
+        // 保存された設定があれば復元
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedCount = localStorage.getItem('seatTotalCount');
+            if (savedCount) totalCountInput.value = savedCount;
+
+            const savedBoy = localStorage.getItem('seatBoyCount');
+            if (savedBoy) boyCountInput.value = savedBoy;
+
+            const savedGirl = localStorage.getItem('seatGirlCount');
+            if (savedGirl) girlCountInput.value = savedGirl;
+
+            const savedCols = localStorage.getItem('seatColumns');
+            if (savedCols) {
+                columnsSelect.value = savedCols;
+            } else {
+                columnsSelect.value = "6";
+            }
+
+            const savedMode = localStorage.getItem('seatPairMode');
+            if (savedMode) {
+                pairModeSelect.value = savedMode;
+                toggleModeInputs();
+            }
+        });
+
+        function shuffleSeats() {
+            const cols = parseInt(columnsSelect.value);
+            const pairMode = pairModeSelect.value;
+            selectedIndex = null;
+
+            localStorage.setItem('seatColumns', cols);
+            localStorage.setItem('seatPairMode', pairMode);
+
+            if (pairMode === 'boyGirl') {
+                const bCount = parseInt(boyCountInput.value);
+                const gCount = parseInt(girlCountInput.value);
+
+                if (isNaN(bCount) || bCount < 0 || isNaN(gCount) || gCount < 0 || (bCount + gCount) === 0) {
+                    alert('正しい男子・女子の人数を入力してください。');
+                    return;
+                }
+
+                localStorage.setItem('seatBoyCount', bCount);
+                localStorage.setItem('seatGirlCount', gCount);
+
+                let boys = [];
+                let girls = [];
+                for (let i = 1; i <= bCount; i++) boys.push({ text: `男${i}`, gender: 'boy' });
+                for (let i = 1; i <= gCount; i++) girls.push({ text: `女${i}`, gender: 'girl' });
+
+                boys.sort(() => Math.random() - 0.5);
+                girls.sort(() => Math.random() - 0.5);
+
+                let totalCount = bCount + gCount;
+                let validItems = new Array(totalCount).fill(null);
+                let rows = Math.ceil(totalCount / cols);
+
+                // 【ステップ1】有効な生徒の席だけを先頭から綺麗に市松模様で埋めていく（途中に空欄を作らない）
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        let index = r * cols + c;
+                        if (index >= totalCount) break;
+
+                        let preferBoy = ((r + c) % 2 === 0);
+
+                        if (preferBoy) {
+                            if (boys.length > 0) {
+                                validItems[index] = boys.pop();
+                            } else if (girls.length > 0) {
+                                validItems[index] = girls.pop();
+                            }
+                        } else {
+                            if (girls.length > 0) {
+                                validItems[index] = girls.pop();
+                            } else if (boys.length > 0) {
+                                validItems[index] = boys.pop();
+                            }
+                        }
+                    }
+                }
+
+                // 安全策の残り割り当て
+                for (let i = 0; i < totalCount; i++) {
+                    if (validItems[i] === null) {
+                        if (boys.length > 0) validItems[i] = boys.pop();
+                        else if (girls.length > 0) validItems[i] = girls.pop();
+                    }
+                }
+
+                // 【ステップ2】最後の行の空いた部分（端数）だけに「空席（empty）」のスペースを後ろに追加する
+                let totalSlots = rows * cols;
+                let gridSlots = [...validItems];
+                while (gridSlots.length < totalSlots) {
+                    gridSlots.push({ text: '', gender: 'empty' });
+                }
+
+                currentPlacedItems = gridSlots;
+
+            } else {
+                const count = parseInt(totalCountInput.value);
+                if (isNaN(count) || count <= 0) {
+                    alert('正しい人数を入力してください。');
+                    return;
+                }
+                localStorage.setItem('seatTotalCount', count);
+
+                let items = [];
+                for (let i = 1; i <= count; i++) {
+                    items.push({ text: `${i}番`, gender: '' });
+                }
+                for (let i = items.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [items[i], items[j]] = [items[j], items[i]];
+                }
+
+                // 最後の行の端数だけに空席を追加
+                let totalSlots = Math.ceil(count / cols) * cols;
+                while (items.length < totalSlots) {
+                    items.push({ text: '', gender: 'empty' });
+                }
+
+                currentPlacedItems = items;
+            }
+
+            renderSeating();
+        }
+
+        // 席の描画とクリックイベント（全席スワップ対応）
+        function renderSeating() {
+            const cols = parseInt(columnsSelect.value);
+
+            seatingArea.style.display = 'flex';
+            swapHint.classList.add('active');
+            seatingArea.innerHTML = '<div class="teacher-desk">ひなおもて（教壇）</div>';
+            
+            const grid = document.createElement('div');
+            grid.className = 'desk-grid';
+            grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+            currentPlacedItems.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `desk-card ${item.gender}`;
+                if (index === selectedIndex) {
+                    card.classList.add('selected');
+                }
+                card.textContent = item.text;
+
+                // どの席（最後尾の空白スペース含む）をクリックしても入れ替え可能
+                card.onclick = () => {
+                    if (selectedIndex === null) {
+                        selectedIndex = index;
+                        renderSeating();
+                    } else if (selectedIndex === index) {
+                        selectedIndex = null; 
+                        renderSeating();
+                    } else {
+                        let temp = currentPlacedItems[selectedIndex];
+                        currentPlacedItems[selectedIndex] = currentPlacedItems[index];
+                        currentPlacedItems[index] = temp;
+                        selectedIndex = null;
+                        renderSeating();
+                    }
+                };
+
+                grid.appendChild(card);
+            });
+
+            seatingArea.appendChild(grid);
+        }
+    </script>
+</body>
+</html>
