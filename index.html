@@ -45,7 +45,7 @@
 
         .container {
             width: 100%;
-            max-width: 640px; /* PCでも広々と使えるように最大幅を拡張 */
+            max-width: 760px; /* 7〜8列などが多い場合でも横幅を十分に確保できるよう拡張 */
             background: var(--card-bg);
             padding: 32px 24px;
             border-radius: 24px;
@@ -173,7 +173,7 @@
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 16px;
-            max-height: 400px; /* PC画面でより多く見られるように高さを拡大 */
+            max-height: 450px; 
             overflow-y: auto;
             flex-direction: column;
             gap: 12px;
@@ -192,16 +192,16 @@
 
         .desk-grid {
             display: grid;
-            gap: 8px;
+            gap: 6px; /* 列数が多い時でも間隔が詰まりすぎないよう調整 */
         }
 
         .desk-card {
             background: #ffffff;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px 6px;
+            border-radius: 8px;
+            padding: 10px 2px; /* 縦長にならないよう上下の余白を最適化 */
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
             word-break: break-all;
             display: flex;
@@ -210,7 +210,7 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.02);
             cursor: pointer;
             transition: transform 0.1s, border-color 0.1s;
-            min-height: 48px;
+            min-height: 42px; /* 7〜8列でもコンパクトかつ押しやすい高さを維持 */
         }
 
         .desk-card:active {
