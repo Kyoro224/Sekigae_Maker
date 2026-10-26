@@ -37,12 +37,14 @@
             --text-color: #1f2937;
             --text-muted: #6b7280;
             --border-color: #e5e7eb;
+            --success-color: #10b981;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -58,7 +60,7 @@
 
         .container {
             width: 100%;
-            max-width: 760px; /* 7〜8列などが多い場合でも横幅を十分に確保できるよう拡張 */
+            max-width: 760px;
             background: var(--card-bg);
             padding: 32px 24px;
             border-radius: 24px;
@@ -129,7 +131,6 @@
             cursor: pointer;
         }
 
-        /* 男女別の入力欄を並べるコンテナ */
         .gender-inputs {
             display: none;
             gap: 16px;
@@ -167,19 +168,20 @@
             background-color: var(--primary-hover);
         }
 
-        /* 操作ヒント・ステータス表示 */
-        .swap-hint {
+        /* 枠なしのシンプルな注意書き（ボタン直下、結果大枠の直上に配置） */
+        .gender-hint-box {
             font-size: 0.8rem;
             color: var(--text-muted);
             text-align: center;
+            line-height: 1.5;
             display: none;
         }
 
-        .swap-hint.active {
+        .gender-hint-box.active {
             display: block;
         }
 
-        /* 席の結果表示エリア（初期状態は非表示） */
+        /* 席の結果表示エリア */
         .seating-area {
             display: none;
             background-color: #f8fafc;
@@ -205,14 +207,14 @@
 
         .desk-grid {
             display: grid;
-            gap: 6px; /* 列数が多い時でも間隔が詰まりすぎないよう調整 */
+            gap: 6px;
         }
 
         .desk-card {
             background: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 10px 2px; /* 縦長にならないよう上下の余白を最適化 */
+            padding: 10px 2px;
             text-align: center;
             font-size: 0.85rem;
             font-weight: 500;
@@ -223,20 +225,18 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.02);
             cursor: pointer;
             transition: transform 0.1s, border-color 0.1s;
-            min-height: 42px; /* 7〜8列でもコンパクトかつ押しやすい高さを維持 */
+            min-height: 42px;
         }
 
         .desk-card:active {
             transform: scale(0.95);
         }
 
-        /* 選択中のカード強調表示 */
         .desk-card.selected {
             border: 2px solid var(--primary-color);
             box-shadow: 0 0 0 3px rgba(101, 119, 179, 0.3);
         }
 
-        /* 空席（プレースホルダー）用スタイル（最後尾のみ） */
         .desk-card.empty {
             background-color: transparent;
             border: 1px dashed var(--border-color);
@@ -244,7 +244,6 @@
             cursor: pointer;
         }
 
-        /* 男女の背景色による見分け用クラス */
         .desk-card.boy {
             background-color: #eff6ff;
             color: #1e40af;
@@ -253,6 +252,93 @@
         .desk-card.girl {
             background-color: #fdf2f8;
             color: #9d174d;
+        }
+
+        /* 結果エリアの操作ボタン（拡大・保存） */
+        .result-actions {
+            display: none;
+            gap: 8px;
+        }
+
+        .result-actions.active {
+            display: flex;
+        }
+
+        .action-sub-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #f3f4f6;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .action-sub-btn:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* 拡大モーダルのスタイル */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .footer-links {
@@ -282,13 +368,11 @@
             <h1>席替えメーカー</h1>
         </div>
 
-        <!-- 通常モード用の全体人数入力 -->
         <div class="section-group single-input-container" id="totalInputGroup">
             <label for="totalCountInput">クラスの人数（出席番号の合計）</label>
             <input type="number" id="totalCountInput" min="2" max="100" value="30" placeholder="例: 30">
         </div>
 
-        <!-- 男女ペアモード用の個別人数入力 -->
         <div class="gender-inputs" id="genderInputGroup">
             <div class="section-group" style="flex: 1;">
                 <label for="boyCountInput">男子の人数</label>
@@ -314,7 +398,7 @@
                     <option value="8">8列</option>
                 </select>
             </div>
-            <div class="section-group">
+            <div class="settings-row" style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
                 <label for="pairModeSelect">配置モード</label>
                 <select id="pairModeSelect" onchange="toggleModeInputs()">
                     <option value="normal">完全ランダム</option>
@@ -324,17 +408,40 @@
         </div>
 
         <button class="btn" onclick="shuffleSeats()">席替えを実行する！</button>
-        <div class="swap-hint" id="swapHint">💡 入れ替えたい席を2つタップすると位置が入れ替わります</div>
 
-        <!-- 席の結果表示エリア（初期状態は非表示） -->
+        <!-- ▼ ボタン直下、結果大枠の直上に配置したモード別の案内書き ▼ -->
+        <div class="gender-hint-box active" id="genderHintBox">
+            <!-- JavaScriptでモードに応じて文章を切り替えます -->
+        </div>
+
+        <!-- 席の結果表示エリア（大枠） -->
         <div class="seating-area" id="seatingArea">
             <div class="teacher-desk">ひなおもて（教壇）</div>
-            <!-- 動的にグリッドが挿入されます -->
+        </div>
+
+        <!-- 結果エリアの操作ボタン（拡大・保存） -->
+        <div class="result-actions" id="resultActions">
+            <button class="action-sub-btn" onclick="openModal()">🔍 拡大表示する</button>
+            <button class="action-sub-btn" onclick="downloadSeatingImage()">💾 画像で保存</button>
         </div>
 
         <div class="footer-links">
             <a href="https://kyoro224.github.io/">開発者について↗</a>
             <a href="https://kyoro224.github.io/privacy/index.html">️プライバシーポリシー↗</a>
+        </div>
+    </div>
+
+    <!-- 拡大表示用モーダル（背景クリックで閉じます） -->
+    <div id="expandModal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span>席替え結果（拡大表示）</span>
+                <button class="close-modal-btn" onclick="closeModalDirect()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalSeatingArea">
+                <!-- 動的にコピーが挿入されます -->
+            </div>
+            <button class="btn" onclick="downloadSeatingImage()">💾 この画像を保存する</button>
         </div>
     </div>
 
@@ -347,11 +454,14 @@
         const columnsSelect = document.getElementById('columnsSelect');
         const pairModeSelect = document.getElementById('pairModeSelect');
         const seatingArea = document.getElementById('seatingArea');
-        const swapHint = document.getElementById('swapHint');
+        const genderHintBox = document.getElementById('genderHintBox');
+        const resultActions = document.getElementById('resultActions');
+        const expandModal = document.getElementById('expandModal');
+        const modalSeatingArea = document.getElementById('modalSeatingArea');
 
         let currentPlacedItems = []; 
         let selectedIndex = null;
-        let isSeatingActive = false; // 席が表示されているかどうかのフラグ
+        let isSeatingActive = false;
 
         function toggleModeInputs() {
             const mode = pairModeSelect.value;
@@ -364,7 +474,6 @@
             }
         }
 
-        // 保存された設定があれば復元
         window.addEventListener('DOMContentLoaded', () => {
             const savedCount = localStorage.getItem('seatTotalCount');
             if (savedCount) totalCountInput.value = savedCount;
@@ -389,11 +498,10 @@
             }
         });
 
-        // ページを離れる・閉じる・戻るボタンを押す際の警告イベント
         window.addEventListener('beforeunload', (event) => {
             if (isSeatingActive) {
                 event.preventDefault();
-                event.returnValue = ''; // 標準的なブラウザの警告を有効化
+                event.returnValue = '';
             }
         });
 
@@ -429,7 +537,6 @@
                 let validItems = new Array(totalCount).fill(null);
                 let rows = Math.ceil(totalCount / cols);
 
-                // 【ステップ1】有効な生徒の席だけを先頭から綺麗に市松模様で埋めていく（途中に空欄を作らない）
                 for (let r = 0; r < rows; r++) {
                     for (let c = 0; c < cols; c++) {
                         let index = r * cols + c;
@@ -453,7 +560,6 @@
                     }
                 }
 
-                // 安全策の残り割り当て
                 for (let i = 0; i < totalCount; i++) {
                     if (validItems[i] === null) {
                         if (boys.length > 0) validItems[i] = boys.pop();
@@ -461,7 +567,6 @@
                     }
                 }
 
-                // 【ステップ2】最後の行の空いた部分（端数）だけに「空席（empty）」のスペースを後ろに追加する
                 let totalSlots = rows * cols;
                 let gridSlots = [...validItems];
                 while (gridSlots.length < totalSlots) {
@@ -469,6 +574,8 @@
                 }
 
                 currentPlacedItems = gridSlots;
+                // 男女ペア時の注意書き
+                genderHintBox.textContent = '⚠️ 男女の人数に端数がある場合、後ろの列に人数が多い性別がまとまることがあります。席を手動でタップ・Clickして位置をご調整ください！';
 
             } else {
                 const count = parseInt(totalCountInput.value);
@@ -487,26 +594,32 @@
                     [items[i], items[j]] = [items[j], items[i]];
                 }
 
-                // 最後の行の端数だけに空席を追加
                 let totalSlots = Math.ceil(count / cols) * cols;
                 while (items.length < totalSlots) {
                     items.push({ text: '', gender: 'empty' });
                 }
 
                 currentPlacedItems = items;
+                // 完全ランダム時の注意書き
+                genderHintBox.textContent = '💡 席をタップ・Clickして位置を変更することができます。';
             }
 
-            isSeatingActive = true; // 席が表示されたので離脱警告を有効化
+            isSeatingActive = true;
             renderSeating();
         }
 
-        // 席の描画とクリックイベント（全席スワップ対応）
         function renderSeating() {
             const cols = parseInt(columnsSelect.value);
 
             seatingArea.style.display = 'flex';
-            swapHint.classList.add('active');
-            seatingArea.innerHTML = '<div class="teacher-desk">ひなおもて（教壇）</div>';
+            genderHintBox.classList.add('active');
+            resultActions.classList.add('active');
+
+            buildGridContent(seatingArea, cols, false);
+        }
+
+        function buildGridContent(containerElement, cols, isModalContext) {
+            containerElement.innerHTML = '<div class="teacher-desk">ひなおもて（教壇）</div>';
             
             const grid = document.createElement('div');
             grid.className = 'desk-grid';
@@ -515,13 +628,13 @@
             currentPlacedItems.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = `desk-card ${item.gender}`;
-                if (index === selectedIndex) {
+                if (index === selectedIndex && !isModalContext) {
                     card.classList.add('selected');
                 }
                 card.textContent = item.text;
 
-                // どの席（最後尾の空白スペース含む）をクリックしても入れ替え可能
                 card.onclick = () => {
+                    if (isModalContext) return;
                     if (selectedIndex === null) {
                         selectedIndex = index;
                         renderSeating();
@@ -540,7 +653,102 @@
                 grid.appendChild(card);
             });
 
-            seatingArea.appendChild(grid);
+            containerElement.appendChild(grid);
+        }
+
+        function openModal() {
+            const cols = parseInt(columnsSelect.value);
+            buildGridContent(modalSeatingArea, cols, true);
+            expandModal.style.display = 'flex';
+        }
+
+        // グレー部分（背景オーバーレイ）をタップしたときに閉じる処理
+        function closeModal(event) {
+            expandModal.style.display = 'none';
+        }
+
+        // ×ボタンなどで閉じる処理
+        function closeModalDirect() {
+            expandModal.style.display = 'none';
+        }
+
+        function downloadSeatingImage() {
+            const cols = parseInt(columnsSelect.value);
+            const rows = Math.ceil(currentPlacedItems.length / cols);
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const padding = 30;
+            const cardWidth = 90;
+            const cardHeight = 50;
+            const gap = 10;
+            const teacherHeight = 36;
+            const teacherGap = 16;
+
+            const contentWidth = cols * cardWidth + (cols - 1) * gap;
+            const contentHeight = teacherHeight + teacherGap + rows * cardHeight + (rows - 1) * gap;
+
+            canvas.width = contentWidth + padding * 2;
+            canvas.height = contentHeight + padding * 2;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#e2e8f0';
+            ctx.roundRect(padding, padding, contentWidth, teacherHeight, 8);
+            ctx.fill();
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('ひなおもて（教壇）', canvas.width / 2, padding + teacherHeight / 2);
+
+            const startY = padding + teacherHeight + teacherGap;
+            currentPlacedItems.forEach((item, index) => {
+                const r = Math.floor(index / cols);
+                const c = index % cols;
+
+                const x = padding + c * (cardWidth + gap);
+                const y = startY + r * (cardHeight + gap);
+
+                if (item.gender === 'empty') {
+                    ctx.strokeStyle = '#e5e7eb';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([4, 4]);
+                    ctx.roundRect(x, y, cardWidth, cardHeight, 8);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                } else {
+                    if (item.gender === 'boy') {
+                        ctx.fillStyle = '#eff6ff';
+                        ctx.strokeStyle = '#bfdbfe';
+                    } else if (item.gender === 'girl') {
+                        ctx.fillStyle = '#fdf2f8';
+                        ctx.strokeStyle = '#fbcfe8';
+                    } else {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.strokeStyle = '#e5e7eb';
+                    }
+
+                    ctx.lineWidth = 1;
+                    ctx.roundRect(x, y, cardWidth, cardHeight, 8);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = item.gender === 'boy' ? '#1e40af' : (item.gender === 'girl' ? '#9d174d' : '#1f2937');
+                    ctx.font = '500 14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(item.text, x + cardWidth / 2, y + cardHeight / 2);
+                }
+            });
+
+            const link = document.createElement('a');
+            link.download = 'seating-chart.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         }
     </script>
 </body>
