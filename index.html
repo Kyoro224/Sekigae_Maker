@@ -199,7 +199,7 @@
             text-align: center;
             font-size: 0.8rem;
             color: var(--text-muted);
-            padding: 6px;
+            padding: 8px;
             border-radius: 8px;
             font-weight: bold;
             letter-spacing: 3px;
@@ -409,10 +409,8 @@
 
         <button class="btn" onclick="shuffleSeats()">席替えを実行する！</button>
 
-        <!-- ▼ ボタン直下、結果大枠の直上に配置したモード別の案内書き ▼ -->
-        <div class="gender-hint-box active" id="genderHintBox">
-            <!-- JavaScriptでモードに応じて文章を切り替えます -->
-        </div>
+        <!-- ボタン直下、結果大枠の直上に配置したモード別の案内書き -->
+        <div class="gender-hint-box active" id="genderHintBox"></div>
 
         <!-- 席の結果表示エリア（大枠） -->
         <div class="seating-area" id="seatingArea">
@@ -438,9 +436,7 @@
                 <span>席替え結果（拡大表示）</span>
                 <button class="close-modal-btn" onclick="closeModalDirect()">&times;</button>
             </div>
-            <div class="modal-body" id="modalSeatingArea">
-                <!-- 動的にコピーが挿入されます -->
-            </div>
+            <div class="modal-body" id="modalSeatingArea"></div>
             <button class="btn" onclick="downloadSeatingImage()">💾 この画像を保存する</button>
         </div>
     </div>
@@ -574,7 +570,6 @@
                 }
 
                 currentPlacedItems = gridSlots;
-                // 男女ペア時の注意書き
                 genderHintBox.textContent = '⚠️ 男女の人数に端数がある場合、後ろの列に人数が多い性別がまとまることがあります。席を手動でタップ・Clickして位置をご調整ください！';
 
             } else {
@@ -600,7 +595,6 @@
                 }
 
                 currentPlacedItems = items;
-                // 完全ランダム時の注意書き
                 genderHintBox.textContent = '💡 席をタップ・Clickして位置を変更することができます。';
             }
 
@@ -662,93 +656,89 @@
             expandModal.style.display = 'flex';
         }
 
-        // グレー部分（背景オーバーレイ）をタップしたときに閉じる処理
         function closeModal(event) {
             expandModal.style.display = 'none';
         }
 
-        // ×ボタンなどで閉じる処理
         function closeModalDirect() {
             expandModal.style.display = 'none';
         }
 
+        // ▼ HTML要素をSVG（ForeignObject）経由で正確に画像化してダウンロードする堅牢な方式 ▼
         function downloadSeatingImage() {
-            const cols = parseInt(columnsSelect.value);
-            const rows = Math.ceil(currentPlacedItems.length / cols);
-            
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+            // 現在画面にある席表示要素、またはモーダル内の要素を取得
+            const sourceEl = expandModal.style.display === 'flex' 
+                ? modalSeatingArea 
+                : seatingArea;
 
-            const padding = 30;
-            const cardWidth = 90;
-            const cardHeight = 50;
-            const gap = 10;
-            const teacherHeight = 36;
-            const teacherGap = 16;
+            if (!sourceEl || sourceEl.style.display === 'none') return;
 
-            const contentWidth = cols * cardWidth + (cols - 1) * gap;
-            const contentHeight = teacherHeight + teacherGap + rows * cardHeight + (rows - 1) * gap;
+            // 複製してクローンを作成し、一時的に独立した幅・スタイルで描画用コンテナに収める
+            const clone = sourceEl.cloneNode(true);
+            clone.style.maxHeight = 'none';
+            clone.style.overflow = 'visible';
+            clone.style.display = 'flex';
+            clone.style.width = sourceEl.offsetWidth + 'px';
+            clone.style.backgroundColor = '#f8fafc';
 
-            canvas.width = contentWidth + padding * 2;
-            canvas.height = contentHeight + padding * 2;
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.left = '-9999px';
+            wrapper.style.top = '-9999px';
+            wrapper.style.padding = '20px';
+            wrapper.style.backgroundColor = '#ffffff';
+            wrapper.style.borderRadius = '16px';
+            wrapper.appendChild(clone);
+            document.body.appendChild(wrapper);
 
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const width = wrapper.offsetWidth;
+            const height = wrapper.offsetHeight;
 
-            ctx.fillStyle = '#e2e8f0';
-            ctx.roundRect(padding, padding, contentWidth, teacherHeight, 8);
-            ctx.fill();
+            // HTMLをSVGの foreignObject に埋め込む
+            const svgString = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+                    <foreignObject width="100%" height="100%">
+                        <div xmlns="http://www.w3.org/1999/xhtml">
+                            <style>
+                                * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+                                .teacher-desk { background: #e2e8f0; text-align: center; font-size: 0.8rem; color: #6b7280; padding: 8px; border-radius: 8px; font-weight: bold; letter-spacing: 3px; margin-bottom: 12px; }
+                                .desk-grid { display: grid; gap: 6px; grid-template-columns: repeat(${parseInt(columnsSelect.value)}, 1fr); }
+                                .desk-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 2px; text-align: center; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; justify-content: center; min-height: 42px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+                                .desk-card.empty { background-color: transparent; border: 1px dashed #e5e7eb; box-shadow: none; }
+                                .desk-card.boy { background-color: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+                                .desk-card.girl { background-color: #fdf2f8; color: #9d174d; border-color: #fbcfe8; }
+                            </style>
+                            ${wrapper.innerHTML}
+                        </div>
+                    </foreignObject>
+                </svg>
+            `;
 
-            ctx.fillStyle = '#64748b';
-            ctx.font = 'bold 14px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('ひなおもて（教壇）', canvas.width / 2, padding + teacherHeight / 2);
+            const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const URL = window.URL || window.webkitURL || window;
+            const blobURL = URL.createObjectURL(blob);
 
-            const startY = padding + teacherHeight + teacherGap;
-            currentPlacedItems.forEach((item, index) => {
-                const r = Math.floor(index / cols);
-                const c = index % cols;
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = width * 2; // 高解像度（Retina対応）
+                canvas.height = height * 2;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(2, 2);
 
-                const x = padding + c * (cardWidth + gap);
-                const y = startY + r * (cardHeight + gap);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0);
 
-                if (item.gender === 'empty') {
-                    ctx.strokeStyle = '#e5e7eb';
-                    ctx.lineWidth = 1;
-                    ctx.setLineDash([4, 4]);
-                    ctx.roundRect(x, y, cardWidth, cardHeight, 8);
-                    ctx.stroke();
-                    ctx.setLineDash([]);
-                } else {
-                    if (item.gender === 'boy') {
-                        ctx.fillStyle = '#eff6ff';
-                        ctx.strokeStyle = '#bfdbfe';
-                    } else if (item.gender === 'girl') {
-                        ctx.fillStyle = '#fdf2f8';
-                        ctx.strokeStyle = '#fbcfe8';
-                    } else {
-                        ctx.fillStyle = '#ffffff';
-                        ctx.strokeStyle = '#e5e7eb';
-                    }
+                URL.revokeObjectURL(blobURL);
+                document.body.removeChild(wrapper);
 
-                    ctx.lineWidth = 1;
-                    ctx.roundRect(x, y, cardWidth, cardHeight, 8);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    ctx.fillStyle = item.gender === 'boy' ? '#1e40af' : (item.gender === 'girl' ? '#9d174d' : '#1f2937');
-                    ctx.font = '500 14px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(item.text, x + cardWidth / 2, y + cardHeight / 2);
-                }
-            });
-
-            const link = document.createElement('a');
-            link.download = 'seating-chart.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+                const link = document.createElement('a');
+                link.download = 'seating-chart.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+            img.src = blobURL;
         }
     </script>
 </body>
